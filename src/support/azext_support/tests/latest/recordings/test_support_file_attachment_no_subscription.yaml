@@ -15,12 +15,12 @@ interactions:
       ParameterSetName:
       - --file-workspace-name
       User-Agent:
-      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+      - AZURECLI/2.56.0 (MSI) (AAZ) azsdk-python-core/1.28.0 Python/3.11.7 (Windows-10-10.0.22631-SP0)
     method: PUT
     uri: https://management.azure.com/providers/Microsoft.Support/fileWorkspaces/cli000001?api-version=2022-09-01-preview
   response:
     body:
-      string: '{"id":"/providers/Microsoft.Support/fileWorkspaces/cli000001","name":"cli000001","type":"Microsoft.Support/fileWorkspaces","properties":{"expirationTime":"2024-02-07T18:33:31Z","createdOn":"2024-02-06T18:33:31Z"}}'
+      string: '{"id":"/providers/Microsoft.Support/fileWorkspaces/cli000001","name":"cli000001","type":"Microsoft.Support/fileWorkspaces","properties":{"expirationTime":"2024-02-07T22:44:04Z","createdOn":"2024-02-06T22:44:04Z"}}'
     headers:
       cache-control:
       - no-cache
@@ -29,23 +29,23 @@ interactions:
       content-type:
       - application/json; charset=utf-8
       date:
-      - Tue, 06 Feb 2024 18:33:30 GMT
+      - Tue, 06 Feb 2024 22:44:04 GMT
       expires:
       - '-1'
       location:
       - https://management.azure.com/providers/Microsoft.Support/fileWorkspaces/cli000001?api-version=2022-09-01-preview
       pragma:
       - no-cache
-      server:
-      - Kestrel
       strict-transport-security:
       - max-age=31536000; includeSubDomains
+      x-cache:
+      - CONFIG_NOCACHE
       x-content-type-options:
       - nosniff
-      x-ms-operation-identifier:
-      - ''
       x-ms-ratelimit-remaining-tenant-writes:
-      - '1195'
+      - '1199'
+      x-msedge-ref:
+      - 'Ref A: 702F9730F03945DC9DFED70C50C2515A Ref B: CO6AA3150220051 Ref C: 2024-02-06T22:44:02Z'
     status:
       code: 201
       message: Created
@@ -63,12 +63,12 @@ interactions:
       ParameterSetName:
       - --file-workspace-name
       User-Agent:
-      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+      - AZURECLI/2.56.0 (MSI) (AAZ) azsdk-python-core/1.28.0 Python/3.11.7 (Windows-10-10.0.22631-SP0)
     method: GET
     uri: https://management.azure.com/providers/Microsoft.Support/fileWorkspaces/cli000001?api-version=2022-09-01-preview
   response:
     body:
-      string: '{"id":"/providers/Microsoft.Support/fileWorkspaces/cli000001","name":"cli000001","type":"Microsoft.Support/fileWorkspaces","properties":{"expirationTime":"2024-02-07T18:33:31Z","createdOn":"2024-02-06T18:33:31Z"}}'
+      string: '{"id":"/providers/Microsoft.Support/fileWorkspaces/cli000001","name":"cli000001","type":"Microsoft.Support/fileWorkspaces","properties":{"expirationTime":"2024-02-07T22:44:04Z","createdOn":"2024-02-06T22:44:04Z"}}'
     headers:
       cache-control:
       - no-cache
@@ -77,19 +77,19 @@ interactions:
       content-type:
       - application/json; charset=utf-8
       date:
-      - Tue, 06 Feb 2024 18:33:33 GMT
+      - Tue, 06 Feb 2024 22:44:08 GMT
       expires:
       - '-1'
       pragma:
       - no-cache
-      server:
-      - Kestrel
       strict-transport-security:
       - max-age=31536000; includeSubDomains
+      x-cache:
+      - CONFIG_NOCACHE
       x-content-type-options:
       - nosniff
-      x-ms-operation-identifier:
-      - ''
+      x-msedge-ref:
+      - 'Ref A: 4CD47BFB63FB4F9696C17156103A9011 Ref B: CO6AA3150217051 Ref C: 2024-02-06T22:44:07Z'
     status:
       code: 200
       message: OK
@@ -111,12 +111,12 @@ interactions:
       ParameterSetName:
       - --file-workspace-name --file-path
       User-Agent:
-      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+      - AZURECLI/2.56.0 (MSI) (AAZ) azsdk-python-core/1.28.0 Python/3.11.7 (Windows-10-10.0.22631-SP0)
     method: PUT
     uri: https://management.azure.com/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt?api-version=2022-09-01-preview
   response:
     body:
-      string: '{"id":"/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt","name":"testFile.txt","type":"Microsoft.Support/files","properties":{"createdOn":"2024-02-06T18:33:38Z","fileSize":171,"chunkSize":171,"numberOfChunks":1}}'
+      string: '{"id":"/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt","name":"testFile.txt","type":"Microsoft.Support/files","properties":{"createdOn":"2024-02-06T22:44:14Z","fileSize":171,"chunkSize":171,"numberOfChunks":1}}'
     headers:
       cache-control:
       - no-cache
@@ -125,23 +125,23 @@ interactions:
       content-type:
       - application/json; charset=utf-8
       date:
-      - Tue, 06 Feb 2024 18:33:38 GMT
+      - Tue, 06 Feb 2024 22:44:15 GMT
       expires:
       - '-1'
       location:
       - https://management.azure.com/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt?api-version=2022-09-01-preview
       pragma:
       - no-cache
-      server:
-      - Kestrel
       strict-transport-security:
       - max-age=31536000; includeSubDomains
+      x-cache:
+      - CONFIG_NOCACHE
       x-content-type-options:
       - nosniff
-      x-ms-operation-identifier:
-      - ''
       x-ms-ratelimit-remaining-tenant-writes:
-      - '1194'
+      - '1199'
+      x-msedge-ref:
+      - 'Ref A: 0E2DAFE60DFE4476A28BF1670053785E Ref B: CO6AA3150220047 Ref C: 2024-02-06T22:44:10Z'
     status:
       code: 201
       message: Created
@@ -163,7 +163,7 @@ interactions:
       ParameterSetName:
       - --file-workspace-name --file-path
       User-Agent:
-      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+      - AZURECLI/2.56.0 (MSI) (AAZ) azsdk-python-core/1.28.0 Python/3.11.7 (Windows-10-10.0.22631-SP0)
     method: POST
     uri: https://management.azure.com/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt/upload?api-version=2022-09-01-preview
   response:
@@ -173,21 +173,21 @@ interactions:
       cache-control:
       - no-cache
       date:
-      - Tue, 06 Feb 2024 18:33:44 GMT
+      - Tue, 06 Feb 2024 22:44:22 GMT
       expires:
       - '-1'
       pragma:
       - no-cache
-      server:
-      - Kestrel
       strict-transport-security:
       - max-age=31536000; includeSubDomains
+      x-cache:
+      - CONFIG_NOCACHE
       x-content-type-options:
       - nosniff
-      x-ms-operation-identifier:
-      - ''
       x-ms-ratelimit-remaining-tenant-writes:
-      - '1193'
+      - '1199'
+      x-msedge-ref:
+      - 'Ref A: 57E724997ADE41DEBD20592B441E6633 Ref B: CO6AA3150218033 Ref C: 2024-02-06T22:44:16Z'
     status:
       code: 204
       message: No Content
@@ -205,12 +205,12 @@ interactions:
       ParameterSetName:
       - --file-workspace-name
       User-Agent:
-      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+      - AZURECLI/2.56.0 (MSI) (AAZ) azsdk-python-core/1.28.0 Python/3.11.7 (Windows-10-10.0.22631-SP0)
     method: GET
     uri: https://management.azure.com/providers/Microsoft.Support/fileWorkspaces/cli000001/files?api-version=2022-09-01-preview
   response:
     body:
-      string: '{"value":[{"id":"/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt","name":"testFile.txt","type":"Microsoft.Support/files","properties":{"createdOn":"2024-02-06T18:33:38Z","fileSize":171,"chunkSize":171,"numberOfChunks":1}}]}'
+      string: '{"value":[{"id":"/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt","name":"testFile.txt","type":"Microsoft.Support/files","properties":{"createdOn":"2024-02-06T22:44:14Z","fileSize":171,"chunkSize":171,"numberOfChunks":1}}]}'
     headers:
       cache-control:
       - no-cache
@@ -219,19 +219,19 @@ interactions:
       content-type:
       - application/json; charset=utf-8
       date:
-      - Tue, 06 Feb 2024 18:33:48 GMT
+      - Tue, 06 Feb 2024 22:44:27 GMT
       expires:
       - '-1'
       pragma:
       - no-cache
-      server:
-      - Kestrel
       strict-transport-security:
       - max-age=31536000; includeSubDomains
+      x-cache:
+      - CONFIG_NOCACHE
       x-content-type-options:
       - nosniff
-      x-ms-operation-identifier:
-      - ''
+      x-msedge-ref:
+      - 'Ref A: E56D0006F7D94EC49C4402891A0B552C Ref B: CO6AA3150218037 Ref C: 2024-02-06T22:44:23Z'
     status:
       code: 200
       message: OK
@@ -249,12 +249,12 @@ interactions:
       ParameterSetName:
       - --file-workspace-name --file-name
       User-Agent:
-      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+      - AZURECLI/2.56.0 (MSI) (AAZ) azsdk-python-core/1.28.0 Python/3.11.7 (Windows-10-10.0.22631-SP0)
     method: GET
     uri: https://management.azure.com/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt?api-version=2022-09-01-preview
   response:
     body:
-      string: '{"id":"/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt","name":"testFile.txt","type":"Microsoft.Support/files","properties":{"createdOn":"2024-02-06T18:33:38Z","fileSize":171,"chunkSize":171,"numberOfChunks":1}}'
+      string: '{"id":"/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt","name":"testFile.txt","type":"Microsoft.Support/files","properties":{"createdOn":"2024-02-06T22:44:14Z","fileSize":171,"chunkSize":171,"numberOfChunks":1}}'
     headers:
       cache-control:
       - no-cache
@@ -263,19 +263,19 @@ interactions:
       content-type:
       - application/json; charset=utf-8
       date:
-      - Tue, 06 Feb 2024 18:33:52 GMT
+      - Tue, 06 Feb 2024 22:44:31 GMT
       expires:
       - '-1'
       pragma:
       - no-cache
-      server:
-      - Kestrel
       strict-transport-security:
       - max-age=31536000; includeSubDomains
+      x-cache:
+      - CONFIG_NOCACHE
       x-content-type-options:
       - nosniff
-      x-ms-operation-identifier:
-      - ''
+      x-msedge-ref:
+      - 'Ref A: C8E6F079B6B04100B30B92D1089C033A Ref B: CO6AA3150217053 Ref C: 2024-02-06T22:44:28Z'
     status:
       code: 200
       message: OK
