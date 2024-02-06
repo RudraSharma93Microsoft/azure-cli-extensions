@@ -295,7 +295,7 @@ class FileWorkspaceCreateSubscription(_CreateFileWorkspace):
         super().pre_operations()
         args = self.ctx.args
         file_workspace_name = str(args.file_workspace_name)
-        _check_name_availability_no_subscription(self.cli_ctx, file_workspace_name, "Microsoft.Support/workspace")
+        _check_name_availability_subscription(self.cli_ctx, file_workspace_name, "Microsoft.Support/workspace")
     
 def encode_string_content(chunk_content):
     return str(base64.b64encode(chunk_content).decode('utf-8'))
