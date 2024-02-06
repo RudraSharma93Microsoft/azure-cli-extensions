@@ -1,0 +1,282 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      CommandName:
+      - support no-subscription file-workspace create
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      ParameterSetName:
+      - --file-workspace-name
+      User-Agent:
+      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+    method: PUT
+    uri: https://management.azure.com/providers/Microsoft.Support/fileWorkspaces/cli000001?api-version=2022-09-01-preview
+  response:
+    body:
+      string: '{"id":"/providers/Microsoft.Support/fileWorkspaces/cli000001","name":"cli000001","type":"Microsoft.Support/fileWorkspaces","properties":{"expirationTime":"2024-02-07T18:33:31Z","createdOn":"2024-02-06T18:33:31Z"}}'
+    headers:
+      cache-control:
+      - no-cache
+      content-length:
+      - '213'
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Tue, 06 Feb 2024 18:33:30 GMT
+      expires:
+      - '-1'
+      location:
+      - https://management.azure.com/providers/Microsoft.Support/fileWorkspaces/cli000001?api-version=2022-09-01-preview
+      pragma:
+      - no-cache
+      server:
+      - Kestrel
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-ms-operation-identifier:
+      - ''
+      x-ms-ratelimit-remaining-tenant-writes:
+      - '1195'
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      CommandName:
+      - support no-subscription file-workspace show
+      Connection:
+      - keep-alive
+      ParameterSetName:
+      - --file-workspace-name
+      User-Agent:
+      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+    method: GET
+    uri: https://management.azure.com/providers/Microsoft.Support/fileWorkspaces/cli000001?api-version=2022-09-01-preview
+  response:
+    body:
+      string: '{"id":"/providers/Microsoft.Support/fileWorkspaces/cli000001","name":"cli000001","type":"Microsoft.Support/fileWorkspaces","properties":{"expirationTime":"2024-02-07T18:33:31Z","createdOn":"2024-02-06T18:33:31Z"}}'
+    headers:
+      cache-control:
+      - no-cache
+      content-length:
+      - '213'
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Tue, 06 Feb 2024 18:33:33 GMT
+      expires:
+      - '-1'
+      pragma:
+      - no-cache
+      server:
+      - Kestrel
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-ms-operation-identifier:
+      - ''
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"properties": {"chunkSize": 171, "fileSize": 171, "numberOfChunks": 1}}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      CommandName:
+      - support no-subscription file upload
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '72'
+      Content-Type:
+      - application/json
+      ParameterSetName:
+      - --file-workspace-name --file-path
+      User-Agent:
+      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+    method: PUT
+    uri: https://management.azure.com/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt?api-version=2022-09-01-preview
+  response:
+    body:
+      string: '{"id":"/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt","name":"testFile.txt","type":"Microsoft.Support/files","properties":{"createdOn":"2024-02-06T18:33:38Z","fileSize":171,"chunkSize":171,"numberOfChunks":1}}'
+    headers:
+      cache-control:
+      - no-cache
+      content-length:
+      - '236'
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Tue, 06 Feb 2024 18:33:38 GMT
+      expires:
+      - '-1'
+      location:
+      - https://management.azure.com/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt?api-version=2022-09-01-preview
+      pragma:
+      - no-cache
+      server:
+      - Kestrel
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-ms-operation-identifier:
+      - ''
+      x-ms-ratelimit-remaining-tenant-writes:
+      - '1194'
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"chunkIndex": 0, "content": "VGhpcyBpcyBhIHRlc3QgZmlsZSB0aGF0IHdpbGwgYmUgdXNlZCB0byB1cGxvYWQgZm9yIHRoZSBGaWxlIFVwbG9hZCBUZXN0IHdpdGggdGVzdF9zdXBwb3J0X3NjZW5hcmlvLiBQbGVhc2UgZG8gbm90IHRvdWNoIHRoaXMgZmlsZSBvciBjaGFuZ2UgYW55dGhpbmcgYWJvdXQgaXQsIHRoYW5rcyA6KSEg"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      CommandName:
+      - support no-subscription file upload
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '260'
+      Content-Type:
+      - application/json
+      ParameterSetName:
+      - --file-workspace-name --file-path
+      User-Agent:
+      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+    method: POST
+    uri: https://management.azure.com/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt/upload?api-version=2022-09-01-preview
+  response:
+    body:
+      string: ''
+    headers:
+      cache-control:
+      - no-cache
+      date:
+      - Tue, 06 Feb 2024 18:33:44 GMT
+      expires:
+      - '-1'
+      pragma:
+      - no-cache
+      server:
+      - Kestrel
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-ms-operation-identifier:
+      - ''
+      x-ms-ratelimit-remaining-tenant-writes:
+      - '1193'
+    status:
+      code: 204
+      message: No Content
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      CommandName:
+      - support no-subscription file list
+      Connection:
+      - keep-alive
+      ParameterSetName:
+      - --file-workspace-name
+      User-Agent:
+      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+    method: GET
+    uri: https://management.azure.com/providers/Microsoft.Support/fileWorkspaces/cli000001/files?api-version=2022-09-01-preview
+  response:
+    body:
+      string: '{"value":[{"id":"/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt","name":"testFile.txt","type":"Microsoft.Support/files","properties":{"createdOn":"2024-02-06T18:33:38Z","fileSize":171,"chunkSize":171,"numberOfChunks":1}}]}'
+    headers:
+      cache-control:
+      - no-cache
+      content-length:
+      - '248'
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Tue, 06 Feb 2024 18:33:48 GMT
+      expires:
+      - '-1'
+      pragma:
+      - no-cache
+      server:
+      - Kestrel
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-ms-operation-identifier:
+      - ''
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      CommandName:
+      - support no-subscription file show
+      Connection:
+      - keep-alive
+      ParameterSetName:
+      - --file-workspace-name --file-name
+      User-Agent:
+      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+    method: GET
+    uri: https://management.azure.com/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt?api-version=2022-09-01-preview
+  response:
+    body:
+      string: '{"id":"/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt","name":"testFile.txt","type":"Microsoft.Support/files","properties":{"createdOn":"2024-02-06T18:33:38Z","fileSize":171,"chunkSize":171,"numberOfChunks":1}}'
+    headers:
+      cache-control:
+      - no-cache
+      content-length:
+      - '236'
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Tue, 06 Feb 2024 18:33:52 GMT
+      expires:
+      - '-1'
+      pragma:
+      - no-cache
+      server:
+      - Kestrel
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-ms-operation-identifier:
+      - ''
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -23,6 +23,8 @@ from .aaz.latest.support.in_subscription.tickets import Update as _Update
 from .aaz.latest.support.in_subscription.tickets import Create as _CreateTicket
 from .aaz.latest.support.in_subscription.communication import Create as _CreateCommunication
 from .aaz.latest.support.no_subscription.communication import Create as _CreateNoSubscriptionCommunication
+from .aaz.latest.support.in_subscription.file_workspace import Create as _CreateFileWorkspace
+from .aaz.latest.support.no_subscription.file_workspace import Create as _CreateNoSubscriptionFileWorkspace
 
 def list_support_tickets(cmd, client, filters=None):
     if filters is None:
@@ -279,6 +281,22 @@ class CommunicationNoSubscriptionCreate(_CreateNoSubscriptionCommunication):
         args = self.ctx.args
         _check_name_availability_no_subscription(self.cli_ctx, str(args.communication_name), "Microsoft.Support/communications")
 
+class FileWorkspaceCreateNoSubscription(_CreateNoSubscriptionFileWorkspace):
+    def pre_operations(self):
+        from azext_support._validators import _check_name_availability_no_subscription
+        super().pre_operations()
+        args = self.ctx.args
+        file_workspace_name = str(args.file_workspace_name)
+        _check_name_availability_no_subscription(self.cli_ctx, file_workspace_name, "Microsoft.Support/workspace")
+    
+class FileWorkspaceCreateSubscription(_CreateFileWorkspace):
+    def pre_operations(self):
+        from azext_support._validators import _check_name_availability_subscription
+        super().pre_operations()
+        args = self.ctx.args
+        file_workspace_name = str(args.file_workspace_name)
+        _check_name_availability_no_subscription(self.cli_ctx, file_workspace_name, "Microsoft.Support/workspace")
+    
 def encode_string_content(chunk_content):
     return str(base64.b64encode(chunk_content).decode('utf-8'))
 
@@ -327,7 +345,6 @@ def upload_files_in_subscription(cmd, file_path, file_workspace_name, subscripti
     from .aaz.latest.support.in_subscription.file import Create as Create_Sub
     from .aaz.latest.support.in_subscription.file import Upload as Upload_Sub
 
-    print(cmd.cli_ctx)
     ##costants for file upload
     max_chunk_size= 2621440
 
@@ -360,4 +377,5 @@ def upload_files_in_subscription(cmd, file_path, file_workspace_name, subscripti
             upload_input = { "file_name": full_file_name, "file_workspace_name": file_workspace_name, "chunk_index": chunk_index, "content": string_encoded_content, "--file-name": full_file_name, "--file-workspace-name": file_workspace_name }
         resp_upload = Upload_Sub(cli_ctx = cmd.cli_ctx)(command_args=upload_input)
         print("File {} has been succesfully uploaded!".format(full_file_name))
+
 

@@ -1,0 +1,282 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      CommandName:
+      - support in-subscription file-workspace create
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      ParameterSetName:
+      - --file-workspace-name --subscription
+      User-Agent:
+      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+    method: PUT
+    uri: https://management.azure.com/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Support/fileWorkspaces/cli000001?api-version=2022-09-01-preview
+  response:
+    body:
+      string: '{"id":"/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Support/fileWorkspaces/cli000001","name":"cli000001","type":"Microsoft.Support/fileWorkspaces","properties":{"expirationTime":"2024-02-07T18:40:18Z","createdOn":"2024-02-06T18:40:18Z"}}'
+    headers:
+      cache-control:
+      - no-cache
+      content-length:
+      - '264'
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Tue, 06 Feb 2024 18:40:18 GMT
+      expires:
+      - '-1'
+      location:
+      - https://management.azure.com/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Support/fileWorkspaces/cli000001?api-version=2022-09-01-preview
+      pragma:
+      - no-cache
+      server:
+      - Kestrel
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-ms-operation-identifier:
+      - tenantId=72f988bf-86f1-41af-91ab-2d7cd011db47,objectId=72b0a4ad-45a2-4411-a30f-7ca7e6de8cfa/centraluseuap/c95a961f-e4aa-474b-b684-ee38fac831a1
+      x-ms-ratelimit-remaining-subscription-writes:
+      - '1198'
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      CommandName:
+      - support in-subscription file-workspace show
+      Connection:
+      - keep-alive
+      ParameterSetName:
+      - --file-workspace-name --subscription
+      User-Agent:
+      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+    method: GET
+    uri: https://management.azure.com/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Support/fileWorkspaces/cli000001?api-version=2022-09-01-preview
+  response:
+    body:
+      string: '{"id":"/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Support/fileWorkspaces/cli000001","name":"cli000001","type":"Microsoft.Support/fileWorkspaces","properties":{"expirationTime":"2024-02-07T18:40:18Z","createdOn":"2024-02-06T18:40:18Z"}}'
+    headers:
+      cache-control:
+      - no-cache
+      content-length:
+      - '264'
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Tue, 06 Feb 2024 18:40:22 GMT
+      expires:
+      - '-1'
+      pragma:
+      - no-cache
+      server:
+      - Kestrel
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-ms-operation-identifier:
+      - tenantId=72f988bf-86f1-41af-91ab-2d7cd011db47,objectId=72b0a4ad-45a2-4411-a30f-7ca7e6de8cfa/centraluseuap/a592d701-a494-4f9a-9a88-84e6fb341f3e
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"properties": {"chunkSize": 171, "fileSize": 171, "numberOfChunks": 1}}'
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      CommandName:
+      - support in-subscription file upload
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '72'
+      Content-Type:
+      - application/json
+      ParameterSetName:
+      - --file-workspace-name --file-path --subscription
+      User-Agent:
+      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+    method: PUT
+    uri: https://management.azure.com/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt?api-version=2022-09-01-preview
+  response:
+    body:
+      string: '{"id":"/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt","name":"testFile.txt","type":"Microsoft.Support/files","properties":{"createdOn":"2024-02-06T18:40:25Z","fileSize":171,"chunkSize":171,"numberOfChunks":1}}'
+    headers:
+      cache-control:
+      - no-cache
+      content-length:
+      - '287'
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Tue, 06 Feb 2024 18:40:25 GMT
+      expires:
+      - '-1'
+      location:
+      - https://management.azure.com/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt?api-version=2022-09-01-preview
+      pragma:
+      - no-cache
+      server:
+      - Kestrel
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-ms-operation-identifier:
+      - tenantId=72f988bf-86f1-41af-91ab-2d7cd011db47,objectId=72b0a4ad-45a2-4411-a30f-7ca7e6de8cfa/centraluseuap/a95f705c-282b-46af-b523-0f817a4ac639
+      x-ms-ratelimit-remaining-subscription-writes:
+      - '1197'
+    status:
+      code: 201
+      message: Created
+- request:
+    body: '{"chunkIndex": 0, "content": "VGhpcyBpcyBhIHRlc3QgZmlsZSB0aGF0IHdpbGwgYmUgdXNlZCB0byB1cGxvYWQgZm9yIHRoZSBGaWxlIFVwbG9hZCBUZXN0IHdpdGggdGVzdF9zdXBwb3J0X3NjZW5hcmlvLiBQbGVhc2UgZG8gbm90IHRvdWNoIHRoaXMgZmlsZSBvciBjaGFuZ2UgYW55dGhpbmcgYWJvdXQgaXQsIHRoYW5rcyA6KSEg"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      CommandName:
+      - support in-subscription file upload
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '260'
+      Content-Type:
+      - application/json
+      ParameterSetName:
+      - --file-workspace-name --file-path --subscription
+      User-Agent:
+      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+    method: POST
+    uri: https://management.azure.com/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt/upload?api-version=2022-09-01-preview
+  response:
+    body:
+      string: ''
+    headers:
+      cache-control:
+      - no-cache
+      date:
+      - Tue, 06 Feb 2024 18:40:30 GMT
+      expires:
+      - '-1'
+      pragma:
+      - no-cache
+      server:
+      - Kestrel
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-ms-operation-identifier:
+      - tenantId=72f988bf-86f1-41af-91ab-2d7cd011db47,objectId=72b0a4ad-45a2-4411-a30f-7ca7e6de8cfa/centraluseuap/fde9357f-8b8e-48b4-b71a-8898575e9698
+      x-ms-ratelimit-remaining-subscription-writes:
+      - '1198'
+    status:
+      code: 204
+      message: No Content
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      CommandName:
+      - support in-subscription file list
+      Connection:
+      - keep-alive
+      ParameterSetName:
+      - --file-workspace-name --subscription
+      User-Agent:
+      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+    method: GET
+    uri: https://management.azure.com/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Support/fileWorkspaces/cli000001/files?api-version=2022-09-01-preview
+  response:
+    body:
+      string: '{"value":[{"id":"/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt","name":"testFile.txt","type":"Microsoft.Support/files","properties":{"createdOn":"2024-02-06T18:40:25Z","fileSize":171,"chunkSize":171,"numberOfChunks":1}}]}'
+    headers:
+      cache-control:
+      - no-cache
+      content-length:
+      - '299'
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Tue, 06 Feb 2024 18:40:33 GMT
+      expires:
+      - '-1'
+      pragma:
+      - no-cache
+      server:
+      - Kestrel
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-ms-operation-identifier:
+      - tenantId=72f988bf-86f1-41af-91ab-2d7cd011db47,objectId=72b0a4ad-45a2-4411-a30f-7ca7e6de8cfa/centraluseuap/6819da8f-27f0-46b7-9e9d-477307bf6b84
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip, deflate
+      CommandName:
+      - support in-subscription file show
+      Connection:
+      - keep-alive
+      ParameterSetName:
+      - --file-workspace-name --file-name --subscription
+      User-Agent:
+      - AZURECLI/2.56.0 (AAZ) azsdk-python-core/1.26.0 Python/3.10.11 (Windows-10-10.0.22621-SP0)
+    method: GET
+    uri: https://management.azure.com/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt?api-version=2022-09-01-preview
+  response:
+    body:
+      string: '{"id":"/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Support/fileWorkspaces/cli000001/files/testFile.txt","name":"testFile.txt","type":"Microsoft.Support/files","properties":{"createdOn":"2024-02-06T18:40:25Z","fileSize":171,"chunkSize":171,"numberOfChunks":1}}'
+    headers:
+      cache-control:
+      - no-cache
+      content-length:
+      - '287'
+      content-type:
+      - application/json; charset=utf-8
+      date:
+      - Tue, 06 Feb 2024 18:40:37 GMT
+      expires:
+      - '-1'
+      pragma:
+      - no-cache
+      server:
+      - Kestrel
+      strict-transport-security:
+      - max-age=31536000; includeSubDomains
+      x-content-type-options:
+      - nosniff
+      x-ms-operation-identifier:
+      - tenantId=72f988bf-86f1-41af-91ab-2d7cd011db47,objectId=72b0a4ad-45a2-4411-a30f-7ca7e6de8cfa/centraluseuap/a19a341f-cd27-4c8b-a637-f0f158a4bf7c
+    status:
+      code: 200
+      message: OK
+version: 1
