@@ -130,11 +130,8 @@ def _check_name_availability_subscription_ticket(cli_ctx, ticket_name, resource_
 
 def _check_name_availability_no_subscription(cli_ctx, resource_name, resource_type):
     from .aaz.latest.support.no_subscription import CheckNameAvailability
-    print(resource_name, resource_type)
     check_name_availability_input = {"name": resource_name, "type": resource_type}
     resp = CheckNameAvailability(cli_ctx=cli_ctx)(command_args=check_name_availability_input)
-    print(resp)
-    print(resp["message"])
     if not resp["nameAvailable"]:
         raise CLIError(resp["message"])
 
