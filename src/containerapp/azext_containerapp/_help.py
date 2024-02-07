@@ -373,16 +373,6 @@ helps['containerapp add-on qdrant'] = """
     short-summary: Commands to manage the qdrant add-on for the Container Apps environment.
 """
 
-helps['containerapp add-on weaviate'] = """
-    type: group
-    short-summary: Commands to manage the weaviate add-on for the Container Apps environment.
-"""
-
-helps['containerapp add-on milvus'] = """
-    type: group
-    short-summary: Commands to manage the milvus add-on for the Container Apps environment.
-"""
-
 helps['containerapp add-on redis create'] = """
     type: command
     short-summary: Command to create the redis add-on.
@@ -408,16 +398,6 @@ helps['containerapp add-on qdrant create'] = """
     short-summary: Command to create the qdrant add-on.
 """
 
-helps['containerapp add-on weaviate create'] = """
-    type: command
-    short-summary: Command to create the weaviate add-on.
-"""
-
-helps['containerapp add-on milvus create'] = """
-    type: command
-    short-summary: Command to create the milvus add-on.
-"""
-
 helps['containerapp add-on redis delete'] = """
     type: command
     short-summary: Command to delete the redis add-on.
@@ -441,16 +421,6 @@ helps['containerapp add-on mariadb delete'] = """
 helps['containerapp add-on qdrant delete'] = """
     type: command
     short-summary: Command to delete the qdrant add-on.
-"""
-
-helps['containerapp add-on weaviate delete'] = """
-    type: command
-    short-summary: Command to delete the weaviate service.
-"""
-
-helps['containerapp add-on milvus delete'] = """
-    type: command
-    short-summary: Command to delete the milvus service.
 """
 
 helps['containerapp env update'] = """
@@ -680,14 +650,6 @@ helps['containerapp github-action add'] = """
           --service-principal-tenant-id 00000000-0000-0000-0000-00000000
           --service-principal-client-secret ClientSecret
           --token MyAccessToken
-    - name: Add GitHub Actions, using Azure Container Registry and personal access token, configure image build via build environment variables.
-      text: az containerapp github-action add -g MyResourceGroup -n my-containerapp --repo-url https://github.com/userid/repo --branch main
-          --registry-url myregistryurl.azurecr.io
-          --service-principal-client-id 00000000-0000-0000-0000-00000000
-          --service-principal-tenant-id 00000000-0000-0000-0000-00000000
-          --service-principal-client-secret ClientSecret
-          --token MyAccessToken
-          --build-env-vars BP_JVM_VERSION=21 BP_MAVEN_VERSION=4
     - name: Add GitHub Actions, using Azure Container Registry and log in to GitHub flow to retrieve personal access token.
       text: az containerapp github-action add -g MyResourceGroup -n my-containerapp --repo-url https://github.com/userid/repo --branch main
           --registry-url myregistryurl.azurecr.io

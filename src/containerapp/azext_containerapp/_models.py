@@ -88,7 +88,7 @@ SecretVolumeItem = {
 
 Volume = {
     "name": None,
-    "storageType": "EmptyDir",  # AzureFile, EmptyDir, Secret or NfsAzureFile
+    "storageType": "EmptyDir",  # AzureFile, EmptyDir or Secret
     "storageName": None,   # None for EmptyDir or Secret, otherwise name of storage resource
     "secrets": None,  # [SecretVolumeItem]
     "mountOptions": None,
@@ -419,8 +419,7 @@ GitHubActionConfiguration = {
     "publishType": None,  # str
     "os": None,  # str
     "runtimeStack": None,  # str
-    "runtimeVersion": None,  # str
-    "buildEnvironmentVariables": None  # [EnvironmentVar]
+    "runtimeVersion": None  # str
 }
 
 RegistryInfo = {
@@ -452,23 +451,9 @@ ContainerAppCustomDomain = {
     "certificateId": None
 }
 
-ManagedEnvironmentStorageProperties = {
-    "location": None,
-    "properties": {
-        "azureFile": None,
-        "nfsAzureFile": None,
-    }
-}
-
 AzureFileProperties = {
     "accountName": None,
     "accountKey": None,
-    "accessMode": None,
-    "shareName": None
-}
-
-NfsAzureFileProperties = {
-    "server": None,
     "accessMode": None,
     "shareName": None
 }

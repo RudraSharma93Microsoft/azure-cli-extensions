@@ -9,7 +9,6 @@ import unittest
 
 from azure.cli.command_modules.containerapp._utils import format_location
 
-from azure.cli.testsdk.decorators import serial_test
 from azure.cli.testsdk.scenario_tests import AllowLargeResponse
 from azure.cli.testsdk import (ScenarioTest, ResourceGroupPreparer, JMESPathCheck, live_only, StorageAccountPreparer)
 
@@ -21,9 +20,6 @@ from .utils import create_containerapp_env
 
 
 class ContainerAppMountAzureFileTest(ScenarioTest):
-    def __init__(self, *arg, **kwargs):
-        super().__init__(*arg, random_config_dir=True, **kwargs)
-
     @AllowLargeResponse(8192)
     @ResourceGroupPreparer(location="eastus")
     def test_container_app_mount_azurefile_e2e(self, resource_group):

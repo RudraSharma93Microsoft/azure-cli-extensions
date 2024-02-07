@@ -259,6 +259,126 @@ class ContainerappIngressTests(ScenarioTest):
             self.assertEqual(revision["properties"]["trafficWeight"], 50)
 
     @AllowLargeResponse(8192)
+    @live_only()  # encounters 'CannotOverwriteExistingCassetteException' only when run from recording (passes when run live)
+    @ResourceGroupPreparer(location="westeurope")
+    def test_containerapp_custom_domains_e2e(self, resource_group):
+        self.cmd('configure --defaults location={}'.format(TEST_LOCATION))
+
+        env_name = self.create_random_name(prefix='containerapp-env', length=24)
+        ca_name = self.create_random_name(prefix='containerapp', length=24)
+
+        create_containerapp_env(self, env_name, resource_group)
+
+        app = self.cmd('containerapp create -g {} -n {} --environment {} --ingress external --target-port 80'.format(resource_group, ca_name, env_name)).get_output_in_json()
+
+        self.cmd('containerapp hostname list -g {} -n {}'.format(resource_group, ca_name), checks=[
+            JMESPathCheck('length(@)', 0),
+        ])
+
+        # list hostnames with a wrong location
+        self.cmd('containerapp hostname list -g {} -n {} -l "{}"'.format(resource_group, ca_name, "eastus2"), checks={
+            JMESPathCheck('length(@)', 0),
+        }, expect_failure=True)
+
+        # create an App service domain and update its txt records
+        contacts = os.path.join(TEST_DIR, 'domain-contact.json')
+        zone_name = "{}.com".format(ca_name)
+        subdomain_1 = "devtest"
+        subdomain_2 = "clitest"
+        txt_name_1 = "asuid.{}".format(subdomain_1)
+        txt_name_2 = "asuid.{}".format(subdomain_2)
+        hostname_1 = "{}.{}".format(subdomain_1, zone_name)
+        hostname_2 = "{}.{}".format(subdomain_2, zone_name)
+        verification_id = app["properties"]["customDomainVerificationId"]
+        self.cmd("appservice domain create -g {} --hostname {} --contact-info=@'{}' --accept-terms".format(resource_group, zone_name, contacts)).get_output_in_json()
+        self.cmd('network dns record-set txt add-record -g {} -z {} -n {} -v {}'.format(resource_group, zone_name, txt_name_1, verification_id)).get_output_in_json()
+        self.cmd('network dns record-set txt add-record -g {} -z {} -n {} -v {}'.format(resource_group, zone_name, txt_name_2, verification_id)).get_output_in_json()
+
+        # upload cert, add hostname & binding
+        pfx_file = os.path.join(TEST_DIR, 'cert.pfx')
+        pfx_password = 'test12'
+        cert_id = self.cmd('containerapp ssl upload -n {} -g {} --environment {} --hostname {} --certificate-file "{}" --password {}'.format(ca_name, resource_group, env_name, hostname_1, pfx_file, pfx_password), checks=[
+            JMESPathCheck('[0].name', hostname_1),
+        ]).get_output_in_json()[0]["certificateId"]
+
+        self.cmd('containerapp hostname list -g {} -n {}'.format(resource_group, ca_name), checks=[
+            JMESPathCheck('length(@)', 1),
+            JMESPathCheck('[0].name', hostname_1),
+            JMESPathCheck('[0].bindingType', "SniEnabled"),
+            JMESPathCheck('[0].certificateId', cert_id),
+        ])
+
+        # get cert thumbprint
+        cert_thumbprint = self.cmd('containerapp env certificate list -n {} -g {} -c {}'.format(env_name, resource_group, cert_id), checks=[
+            JMESPathCheck('length(@)', 1),
+            JMESPathCheck('[0].id', cert_id),
+        ]).get_output_in_json()[0]["properties"]["thumbprint"]
+
+        # add binding by cert thumbprint
+        self.cmd('containerapp hostname bind -g {} -n {} --hostname {} --thumbprint {}'.format(resource_group, ca_name, hostname_2, cert_thumbprint), expect_failure=True)
+
+        self.cmd('containerapp hostname bind -g {} -n {} --hostname {} --thumbprint {} -e {}'.format(resource_group, ca_name, hostname_2, cert_thumbprint, env_name), checks=[
+            JMESPathCheck('length(@)', 2),
+        ])
+
+        self.cmd('containerapp hostname list -g {} -n {}'.format(resource_group, ca_name), checks=[
+            JMESPathCheck('length(@)', 2),
+            JMESPathCheck('[0].bindingType', "SniEnabled"),
+            JMESPathCheck('[0].certificateId', cert_id),
+            JMESPathCheck('[1].bindingType', "SniEnabled"),
+            JMESPathCheck('[1].certificateId', cert_id),
+        ])
+
+        # delete hostname with a wrong location
+        self.cmd('containerapp hostname delete -g {} -n {} --hostname {} -l "{}" --yes'.format(resource_group, ca_name, hostname_1, "eastus2"), expect_failure=True)
+
+        self.cmd('containerapp hostname delete -g {} -n {} --hostname {} -l "{}" --yes'.format(resource_group, ca_name, hostname_1, app["location"]), checks=[
+            JMESPathCheck('length(@)', 1),
+            JMESPathCheck('[0].name', hostname_2),
+            JMESPathCheck('[0].bindingType', "SniEnabled"),
+            JMESPathCheck('[0].certificateId', cert_id),
+        ]).get_output_in_json()
+
+        self.cmd('containerapp hostname list -g {} -n {}'.format(resource_group, ca_name), checks=[
+            JMESPathCheck('length(@)', 1),
+            JMESPathCheck('[0].name', hostname_2),
+            JMESPathCheck('[0].bindingType', "SniEnabled"),
+            JMESPathCheck('[0].certificateId', cert_id),
+        ])
+
+        self.cmd('containerapp hostname delete -g {} -n {} --hostname {} --yes'.format(resource_group, ca_name, hostname_2), checks=[
+            JMESPathCheck('length(@)', 0),
+        ]).get_output_in_json()
+
+        # add binding by cert id
+        self.cmd('containerapp hostname bind -g {} -n {} --hostname {} --certificate {}'.format(resource_group, ca_name, hostname_2, cert_id), checks=[
+            JMESPathCheck('length(@)', 1),
+            JMESPathCheck('[0].bindingType', "SniEnabled"),
+            JMESPathCheck('[0].certificateId', cert_id),
+            JMESPathCheck('[0].name', hostname_2),
+        ]).get_output_in_json()
+
+        self.cmd('containerapp hostname delete -g {} -n {} --hostname {} --yes'.format(resource_group, ca_name, hostname_2), checks=[
+            JMESPathCheck('length(@)', 0),
+        ]).get_output_in_json()
+
+        # add binding by cert name, with and without environment
+        cert_name = parse_resource_id(cert_id)["resource_name"]
+
+        self.cmd('containerapp hostname bind -g {} -n {} --hostname {} --certificate {}'.format(resource_group, ca_name, hostname_1, cert_name), expect_failure=True)
+
+        self.cmd('containerapp hostname bind -g {} -n {} --hostname {} --certificate {} -e {}'.format(resource_group, ca_name, hostname_1, cert_name, env_name), checks=[
+            JMESPathCheck('length(@)', 1),
+            JMESPathCheck('[0].bindingType', "SniEnabled"),
+            JMESPathCheck('[0].certificateId', cert_id),
+            JMESPathCheck('[0].name', hostname_1),
+        ]).get_output_in_json()
+
+        self.cmd('containerapp hostname delete -g {} -n {} --hostname {} --yes'.format(resource_group, ca_name, hostname_1), checks=[
+            JMESPathCheck('length(@)', 0),
+        ]).get_output_in_json()
+
+    @AllowLargeResponse(8192)
     @ResourceGroupPreparer(location="northeurope")
     @live_only()  # encounters 'CannotOverwriteExistingCassetteException' only when run from recording (passes when run live) and vnet command error in cli pipeline
     def test_containerapp_tcp_ingress(self, resource_group):
@@ -513,134 +633,6 @@ class ContainerappIngressTests(ScenarioTest):
         ])
 
 
-class ContainerappCustomDomainTests(ScenarioTest):
-    def __init__(self, *arg, **kwargs):
-        super().__init__(*arg, random_config_dir=True, **kwargs)
-
-    @AllowLargeResponse(8192)
-    @live_only()  # encounters 'CannotOverwriteExistingCassetteException' only when run from recording (passes when run live)
-    @ResourceGroupPreparer(location="westeurope")
-    def test_containerapp_custom_domains_e2e(self, resource_group):
-        location = TEST_LOCATION
-        if format_location(location) == format_location(STAGE_LOCATION):
-            location = "eastus"
-        self.cmd('configure --defaults location={}'.format(location))
-
-        env_name = self.create_random_name(prefix='containerapp-env', length=24)
-        ca_name = self.create_random_name(prefix='containerapp', length=24)
-
-        create_containerapp_env(self, env_name, resource_group)
-
-        app = self.cmd('containerapp create -g {} -n {} --environment {} --ingress external --target-port 80'.format(resource_group, ca_name, env_name)).get_output_in_json()
-
-        self.cmd('containerapp hostname list -g {} -n {}'.format(resource_group, ca_name), checks=[
-            JMESPathCheck('length(@)', 0),
-        ])
-
-        # list hostnames with a wrong location
-        self.cmd('containerapp hostname list -g {} -n {} -l "{}"'.format(resource_group, ca_name, "eastus2"), checks={
-            JMESPathCheck('length(@)', 0),
-        }, expect_failure=True)
-
-        # create an App service domain and update its txt records
-        contacts = os.path.join(TEST_DIR, 'domain-contact.json')
-        zone_name = "{}.com".format(ca_name)
-        subdomain_1 = "devtest"
-        subdomain_2 = "clitest"
-        txt_name_1 = "asuid.{}".format(subdomain_1)
-        txt_name_2 = "asuid.{}".format(subdomain_2)
-        hostname_1 = "{}.{}".format(subdomain_1, zone_name)
-        hostname_2 = "{}.{}".format(subdomain_2, zone_name)
-        verification_id = app["properties"]["customDomainVerificationId"]
-        self.cmd("appservice domain create -g {} --hostname {} --contact-info=@'{}' --accept-terms".format(resource_group, zone_name, contacts)).get_output_in_json()
-        self.cmd('network dns record-set txt add-record -g {} -z {} -n {} -v {}'.format(resource_group, zone_name, txt_name_1, verification_id)).get_output_in_json()
-        self.cmd('network dns record-set txt add-record -g {} -z {} -n {} -v {}'.format(resource_group, zone_name, txt_name_2, verification_id)).get_output_in_json()
-
-        # upload cert, add hostname & binding
-        pfx_file = os.path.join(TEST_DIR, 'cert.pfx')
-        pfx_password = 'test12'
-        cert_id = self.cmd('containerapp ssl upload -n {} -g {} --environment {} --hostname {} --certificate-file "{}" --password {}'.format(ca_name, resource_group, env_name, hostname_1, pfx_file, pfx_password), checks=[
-            JMESPathCheck('[0].name', hostname_1),
-        ]).get_output_in_json()[0]["certificateId"]
-
-        self.cmd('containerapp hostname list -g {} -n {}'.format(resource_group, ca_name), checks=[
-            JMESPathCheck('length(@)', 1),
-            JMESPathCheck('[0].name', hostname_1),
-            JMESPathCheck('[0].bindingType', "SniEnabled"),
-            JMESPathCheck('[0].certificateId', cert_id),
-        ])
-
-        # get cert thumbprint
-        cert_thumbprint = self.cmd('containerapp env certificate list -n {} -g {} -c {}'.format(env_name, resource_group, cert_id), checks=[
-            JMESPathCheck('length(@)', 1),
-            JMESPathCheck('[0].id', cert_id),
-        ]).get_output_in_json()[0]["properties"]["thumbprint"]
-
-        # add binding by cert thumbprint
-        self.cmd('containerapp hostname bind -g {} -n {} --hostname {} --thumbprint {}'.format(resource_group, ca_name, hostname_2, cert_thumbprint), expect_failure=True)
-
-        self.cmd('containerapp hostname bind -g {} -n {} --hostname {} --thumbprint {} -e {}'.format(resource_group, ca_name, hostname_2, cert_thumbprint, env_name), checks=[
-            JMESPathCheck('length(@)', 2),
-        ])
-
-        self.cmd('containerapp hostname list -g {} -n {}'.format(resource_group, ca_name), checks=[
-            JMESPathCheck('length(@)', 2),
-            JMESPathCheck('[0].bindingType', "SniEnabled"),
-            JMESPathCheck('[0].certificateId', cert_id),
-            JMESPathCheck('[1].bindingType', "SniEnabled"),
-            JMESPathCheck('[1].certificateId', cert_id),
-        ])
-
-        # delete hostname with a wrong location
-        self.cmd('containerapp hostname delete -g {} -n {} --hostname {} -l "{}" --yes'.format(resource_group, ca_name, hostname_1, "eastus2"), expect_failure=True)
-
-        self.cmd('containerapp hostname delete -g {} -n {} --hostname {} -l "{}" --yes'.format(resource_group, ca_name, hostname_1, app["location"]), checks=[
-            JMESPathCheck('length(@)', 1),
-            JMESPathCheck('[0].name', hostname_2),
-            JMESPathCheck('[0].bindingType', "SniEnabled"),
-            JMESPathCheck('[0].certificateId', cert_id),
-        ]).get_output_in_json()
-
-        self.cmd('containerapp hostname list -g {} -n {}'.format(resource_group, ca_name), checks=[
-            JMESPathCheck('length(@)', 1),
-            JMESPathCheck('[0].name', hostname_2),
-            JMESPathCheck('[0].bindingType', "SniEnabled"),
-            JMESPathCheck('[0].certificateId', cert_id),
-        ])
-
-        self.cmd('containerapp hostname delete -g {} -n {} --hostname {} --yes'.format(resource_group, ca_name, hostname_2), checks=[
-            JMESPathCheck('length(@)', 0),
-        ]).get_output_in_json()
-
-        # add binding by cert id
-        self.cmd('containerapp hostname bind -g {} -n {} --hostname {} --certificate {}'.format(resource_group, ca_name, hostname_2, cert_id), checks=[
-            JMESPathCheck('length(@)', 1),
-            JMESPathCheck('[0].bindingType', "SniEnabled"),
-            JMESPathCheck('[0].certificateId', cert_id),
-            JMESPathCheck('[0].name', hostname_2),
-        ]).get_output_in_json()
-
-        self.cmd('containerapp hostname delete -g {} -n {} --hostname {} --yes'.format(resource_group, ca_name, hostname_2), checks=[
-            JMESPathCheck('length(@)', 0),
-        ]).get_output_in_json()
-
-        # add binding by cert name, with and without environment
-        cert_name = parse_resource_id(cert_id)["resource_name"]
-
-        self.cmd('containerapp hostname bind -g {} -n {} --hostname {} --certificate {}'.format(resource_group, ca_name, hostname_1, cert_name), expect_failure=True)
-
-        self.cmd('containerapp hostname bind -g {} -n {} --hostname {} --certificate {} -e {}'.format(resource_group, ca_name, hostname_1, cert_name, env_name), checks=[
-            JMESPathCheck('length(@)', 1),
-            JMESPathCheck('[0].bindingType', "SniEnabled"),
-            JMESPathCheck('[0].certificateId', cert_id),
-            JMESPathCheck('[0].name', hostname_1),
-        ]).get_output_in_json()
-
-        self.cmd('containerapp hostname delete -g {} -n {} --hostname {} --yes'.format(resource_group, ca_name, hostname_1), checks=[
-            JMESPathCheck('length(@)', 0),
-        ]).get_output_in_json()
-
-
 class ContainerappDaprTests(ScenarioTest):
     def __init__(self, *arg, **kwargs):
         super().__init__(*arg, random_config_dir=True, **kwargs)
@@ -734,8 +726,6 @@ class ContainerappDaprTests(ScenarioTest):
 
 
 class ContainerappServiceBindingTests(ScenarioTest):
-    def __init__(self, *arg, **kwargs):
-        super().__init__(*arg, random_config_dir=True, **kwargs)
 
     @AllowLargeResponse(8192)
     @ResourceGroupPreparer(location="eastus2")
@@ -1109,12 +1099,13 @@ class ContainerappServiceBindingTests(ScenarioTest):
     @AllowLargeResponse(8192)
     @ResourceGroupPreparer(location="eastus2")
     def test_containerapp_addon_binding_e2e(self, resource_group):
-        # type "linkers" is not available in North Central US (Stage), if the TEST_LOCATION is "northcentralusstage", use francecentral as location
+        # type "linkers" is not available in North Central US (Stage), if the TEST_LOCATION is "northcentralusstage", use eastus as location
         location = TEST_LOCATION
         if format_location(location) == format_location(STAGE_LOCATION):
-            location = "francecentral"
+            location = "eastus"
         self.cmd('configure --defaults location={}'.format(location))
 
+        env_name = self.create_random_name(prefix='containerapp-env', length=24)
         ca_name = self.create_random_name(prefix='containerapp', length=24)
         image = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
         redis_ca_name = 'redis'
@@ -1122,94 +1113,75 @@ class ContainerappServiceBindingTests(ScenarioTest):
         kafka_ca_name = 'kafka'
         mariadb_ca_name = 'mariadb'
         qdrant_ca_name = "qdrant"
-        weaviate_ca_name = "weaviate"
-        milvus_ca_name = "milvus"
-        ADDON_LIST = ["redis", "postgres", "kafka", "mariadb", "qdrant", "weaviate", "milvus"]
-
-        env_id = prepare_containerapp_env_for_app_e2e_tests(self, location=location)
-        env_rg = parse_resource_id(env_id).get('resource_group')
-        env_name = parse_resource_id(env_id).get('name')
+        ADDON_LIST = ["redis", "postgres", "kafka", "mariadb", "qdrant"]
+        create_containerapp_env(self, env_name, resource_group)
 
         self.cmd('containerapp add-on redis create -g {} -n {} --environment {}'.format(
-            env_rg, redis_ca_name, env_name))
+            resource_group, redis_ca_name, env_name))
 
         self.cmd('containerapp add-on postgres create -g {} -n {} --environment {}'.format(
-            env_rg, postgres_ca_name, env_name))
+            resource_group, postgres_ca_name, env_name))
 
         self.cmd('containerapp add-on kafka create -g {} -n {} --environment {}'.format(
-            env_rg, kafka_ca_name, env_name))
+            resource_group, kafka_ca_name, env_name))
 
         self.cmd('containerapp add-on mariadb create -g {} -n {} --environment {}'.format(
-            env_rg, mariadb_ca_name, env_name))
+            resource_group, mariadb_ca_name, env_name))
 
         self.cmd('containerapp add-on qdrant create -g {} -n {} --environment {}'.format(
-            env_rg, qdrant_ca_name, env_name))
-
-        self.cmd('containerapp add-on weaviate create -g {} -n {} --environment {}'.format(
-            env_rg, weaviate_ca_name, env_name))
-        
-        self.cmd('containerapp add-on milvus create -g {} -n {} --environment {}'.format(
-            env_rg, milvus_ca_name, env_name))
+            resource_group, qdrant_ca_name, env_name))
 
         for addon in ADDON_LIST:
-            self.cmd(f'containerapp show -g {env_rg} -n {addon}', checks=[
+            self.cmd(f'containerapp show -g {resource_group} -n {addon}', checks=[
                 JMESPathCheck("properties.provisioningState", "Succeeded")])
 
         self.cmd('containerapp create -g {} -n {} --environment {} --image {} --bind postgres:postgres_binding redis'.format(
-            env_rg, ca_name, env_name, image), checks=[
+            resource_group, ca_name, env_name, image), checks=[
             JMESPathCheck('properties.template.serviceBinds[0].name', "postgres_binding"),
             JMESPathCheck('properties.template.serviceBinds[1].name', "redis")
         ])
 
         self.cmd('containerapp update -g {} -n {} --unbind postgres_binding'.format(
-            env_rg, ca_name, image), checks=[
+            resource_group, ca_name, image), checks=[
             JMESPathCheck('properties.template.serviceBinds[0].name', "redis"),
         ])
 
-        self.cmd('containerapp update -g {} -n {} --bind postgres:postgres_binding kafka mariadb qdrant weaviate milvus'.format(
-            env_rg, ca_name, image), checks=[
+        self.cmd('containerapp update -g {} -n {} --bind postgres:postgres_binding kafka mariadb qdrant'.format(
+            resource_group, ca_name, image), checks=[
             JMESPathCheck("properties.provisioningState", "Succeeded"),
             JMESPathCheck('properties.template.serviceBinds[0].name', "redis"),
             JMESPathCheck('properties.template.serviceBinds[1].name', "postgres_binding"),
             JMESPathCheck('properties.template.serviceBinds[2].name', "kafka"),
             JMESPathCheck('properties.template.serviceBinds[3].name', "mariadb"),
-            JMESPathCheck('properties.template.serviceBinds[4].name', "qdrant"),
-            JMESPathCheck('properties.template.serviceBinds[5].name', "weaviate"),
-            JMESPathCheck('properties.template.serviceBinds[6].name', "milvus")
+            JMESPathCheck('properties.template.serviceBinds[4].name', "qdrant")
         ])
 
         self.cmd('containerapp add-on postgres delete -g {} -n {} --yes'.format(
-            env_rg, postgres_ca_name, env_name))
+            resource_group, postgres_ca_name, env_name))
 
         self.cmd('containerapp add-on redis delete -g {} -n {} --yes'.format(
-            env_rg, redis_ca_name, env_name))
+            resource_group, redis_ca_name, env_name))
 
         self.cmd('containerapp add-on kafka delete -g {} -n {} --yes'.format(
-            env_rg, kafka_ca_name, env_name))
+            resource_group, kafka_ca_name, env_name))
 
         self.cmd('containerapp add-on mariadb delete -g {} -n {} --yes'.format(
-            env_rg, mariadb_ca_name, env_name))
+            resource_group, mariadb_ca_name, env_name))
 
         self.cmd('containerapp add-on qdrant delete -g {} -n {} --yes'.format(
-            env_rg, qdrant_ca_name, env_name))
+            resource_group, qdrant_ca_name, env_name))
 
-        self.cmd('containerapp add-on weaviate delete -g {} -n {} --yes'.format(
-            env_rg, weaviate_ca_name, env_name))
-        
-        self.cmd('containerapp add-on milvus delete -g {} -n {} --yes'.format(
-            env_rg, milvus_ca_name, env_name))
+        self.cmd(f'containerapp delete -g {resource_group} -n {ca_name} --yes')
 
-        self.cmd(f'containerapp delete -g {env_rg} -n {ca_name} --yes')
-
-        self.cmd('containerapp add-on list -g {} --environment {}'.format(env_rg, env_name), checks=[
+        self.cmd('containerapp add-on list -g {} --environment {}'.format(resource_group, env_name), checks=[
             JMESPathCheck('length(@)', 0),
         ])
 
-        self.cmd('containerapp list -g {} --environment {}'.format(env_rg, env_name), checks=[
+        self.cmd('containerapp list -g {} --environment {}'.format(resource_group, env_name), checks=[
             JMESPathCheck('length(@)', 0),
         ])
 
-        self.cmd(f'containerapp env delete -g {env_rg} -n {env_name} --yes')
+        self.cmd(f'containerapp env delete -g {resource_group} -n {env_name} --yes')
 
     @AllowLargeResponse(8192)
     @ResourceGroupPreparer(location="eastus2")
@@ -1899,7 +1871,6 @@ properties:
                 - name: secret1
                   value: 1
                 activeRevisionsMode: Multiple
-                maxInactiveRevisions: 10
                 ingress:
                   external: true
                   allowInsecure: false
@@ -1955,7 +1926,6 @@ properties:
             JMESPathCheck("properties.configuration.ingress.ipSecurityRestrictions[0].name", "name"),
             JMESPathCheck("properties.configuration.ingress.ipSecurityRestrictions[0].ipAddressRange", "1.1.1.1/10"),
             JMESPathCheck("properties.configuration.ingress.ipSecurityRestrictions[0].action", "Allow"),
-            JMESPathCheck("properties.configuration.maxInactiveRevisions", "10"),
             JMESPathCheck("length(properties.configuration.secrets)", 1),
             JMESPathCheck("properties.environmentId", containerapp_env["id"]),
             JMESPathCheck("properties.template.revisionSuffix", "myrevision"),
@@ -2352,29 +2322,3 @@ class ContainerappOtherPropertyTests(ScenarioTest):
         self.cmd(f'containerapp create -g {resource_group} -n {app} --image {image} --ingress external --target-port 80 --environment {env} --termination-grace-period {terminationGracePeriodSeconds}')
 
         self.cmd(f'containerapp show -g {resource_group} -n {app}', checks=[JMESPathCheck("properties.template.terminationGracePeriodSeconds", terminationGracePeriodSeconds)])
-
-    @AllowLargeResponse(8192)
-    @ResourceGroupPreparer(location="northeurope")
-    def test_containerapp_max_inactive_revisions(self, resource_group):
-        self.cmd('configure --defaults location={}'.format(TEST_LOCATION))
-
-        app = self.create_random_name(prefix='aca', length=24)
-        image = "mcr.microsoft.com/k8se/quickstart:latest"
-        
-        env = prepare_containerapp_env_for_app_e2e_tests(self)
-
-        self.cmd(f'containerapp create -g {resource_group} -n {app} --image {image} --ingress external --target-port 80 --environment {env} --cpu 0.5 --memory 1Gi')
-        self.cmd(f'containerapp show -g {resource_group} -n {app}', checks=[JMESPathCheck("properties.configuration.maxInactiveRevisions", None)])
-
-        maxInactiveRevisions = 100
-        self.cmd(f'containerapp create -g {resource_group} -n {app} --image {image} --ingress external --target-port 80 --environment {env} --max-inactive-revisions {maxInactiveRevisions}')
-        self.cmd(f'containerapp show -g {resource_group} -n {app}', checks=[JMESPathCheck("properties.configuration.maxInactiveRevisions", maxInactiveRevisions)])
-
-        maxInactiveRevisions = 50
-        self.cmd(f'containerapp update -g {resource_group} -n {app} --cpu 0.5 --memory 1Gi --max-inactive-revisions {maxInactiveRevisions}')
-        self.cmd(f'containerapp show -g {resource_group} -n {app}', checks=[JMESPathCheck("properties.configuration.maxInactiveRevisions", maxInactiveRevisions)])
-
-        self.cmd(f'containerapp update -g {resource_group} -n {app} --cpu 0.25 --memory 0.5Gi')
-        self.cmd(f'containerapp show -g {resource_group} -n {app}', checks=[JMESPathCheck("properties.configuration.maxInactiveRevisions", maxInactiveRevisions)])
-
-        

@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
-import sys
+
 import time
 import requests
 from azure.cli.command_modules.containerapp._utils import format_location
@@ -27,7 +27,7 @@ def prepare_containerapp_env_for_app_e2e_tests(test_cls, location=TEST_LOCATION)
             rg_location = location
             if format_location(rg_location) == format_location(STAGE_LOCATION):
                 rg_location = "eastus"
-            test_cls.cmd(f'group create -n {rg_name} -l {rg_location}')
+            test_cls.cmd(f'group create -n {rg_name} -l {location}')
             test_cls.cmd(f'containerapp env create -g {rg_name} -n {env_name} --logs-destination none')
             managed_env = test_cls.cmd('containerapp env show -g {} -n {}'.format(rg_name, env_name)).get_output_in_json()
 
@@ -37,21 +37,18 @@ def prepare_containerapp_env_for_app_e2e_tests(test_cls, location=TEST_LOCATION)
     return managed_env["id"]
 
 
-def create_containerapp_env(test_cls, env_name, resource_group, location=None, subnetId=None):
+def create_containerapp_env(test_cls, env_name, resource_group, location=None):
     logs_workspace_name = test_cls.create_random_name(prefix='containerapp-env', length=24)
     logs_workspace_location = location
-    if logs_workspace_location is None or format_location(logs_workspace_location) == format_location(STAGE_LOCATION):
+    if format_location(logs_workspace_location) == format_location(STAGE_LOCATION):
         logs_workspace_location = "eastus"
     logs_workspace_id = test_cls.cmd('monitor log-analytics workspace create -g {} -n {} -l {}'.format(resource_group, logs_workspace_name, logs_workspace_location)).get_output_in_json()["customerId"]
     logs_workspace_key = test_cls.cmd('monitor log-analytics workspace get-shared-keys -g {} -n {}'.format(resource_group, logs_workspace_name)).get_output_in_json()["primarySharedKey"]
 
-    env_command = f'containerapp env create -g {resource_group} -n {env_name} --logs-workspace-id {logs_workspace_id} --logs-workspace-key {logs_workspace_key}'
     if location:
-        env_command = f'{env_command} -l {location}'
-
-    if subnetId:
-        env_command = f'{env_command} --infrastructure-subnet-resource-id {subnetId}'
-    test_cls.cmd(env_command)
+        test_cls.cmd(f'containerapp env create -g {resource_group} -n {env_name} --logs-workspace-id {logs_workspace_id} --logs-workspace-key {logs_workspace_key} -l {location}')
+    else:
+        test_cls.cmd(f'containerapp env create -g {resource_group} -n {env_name} --logs-workspace-id {logs_workspace_id} --logs-workspace-key {logs_workspace_key}')
 
     containerapp_env = test_cls.cmd('containerapp env show -g {} -n {}'.format(resource_group, env_name)).get_output_in_json()
 
@@ -66,21 +63,16 @@ def create_and_verify_containerapp_up(
             env_name = None,
             source_path = None,
             artifact_path = None,
-            build_env_vars = None,
             image = None,
             location = None,
             ingress = None,
             target_port = None,
             app_name = None,
-            requires_acr_prerequisite = False,
-            no_log_destination = False):
+            requires_acr_prerequisite = False):
         # Ensure that the Container App environment is created
         if env_name is None:
            env_name = test_cls.create_random_name(prefix='env', length=24)
-           env_create_cmd = f'containerapp env create -g {resource_group} -n {env_name}'
-           if no_log_destination:
-               env_create_cmd += f" --logs-destination none"
-           test_cls.cmd(env_create_cmd)
+           test_cls.cmd(f'containerapp env create -g {resource_group} -n {env_name}')
 
         if app_name is None:
             # Generate a name for the Container App
@@ -92,8 +84,6 @@ def create_and_verify_containerapp_up(
             up_cmd += f" --source \"{source_path}\""
         if artifact_path:
             up_cmd += f" --artifact \"{artifact_path}\""
-        if build_env_vars:
-            up_cmd += f" --build-env-vars {build_env_vars}"
         if image:
             up_cmd += f" --image {image}"
         if ingress:
@@ -292,7 +282,6 @@ def create_and_verify_containerapp_create_and_update(
             env_name = None,
             source_path = None,
             artifact_path = None,
-            build_env_vars = None,
             image = None,
             ingress = None,
             target_port = None,
@@ -338,8 +327,6 @@ def create_and_verify_containerapp_create_and_update(
             create_cmd += f" --source \"{source_path}\""
         if artifact_path:
             create_cmd += f" --artifact \"{artifact_path}\""
-        if build_env_vars:
-            create_cmd += f" --build-env-vars {build_env_vars}"
         if image:
             create_cmd += f" --image {image}"
             image_name = registry_server + "/" + _reformat_image(image)

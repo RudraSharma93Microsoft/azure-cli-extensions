@@ -5,31 +5,23 @@
 import os
 import time
 import unittest
-from azure.cli.command_modules.containerapp._utils import format_location
 
 from azure.cli.testsdk.scenario_tests import AllowLargeResponse, live_only
 from azure.cli.testsdk import (ScenarioTest, ResourceGroupPreparer, JMESPathCheck)
 from msrestazure.tools import parse_resource_id
 
 from .common import (write_test_file, clean_up_test_file)
-from .common import TEST_LOCATION, STAGE_LOCATION
+from .common import TEST_LOCATION
 from .utils import create_containerapp_env
 
 TEST_DIR = os.path.abspath(os.path.join(os.path.abspath(__file__), '..'))
 
 
 class ContainerappYamlTests(ScenarioTest):
-    def __init__(self, *arg, **kwargs):
-        super().__init__(*arg, random_config_dir=True, **kwargs)
-
     @AllowLargeResponse(8192)
     @ResourceGroupPreparer(location="westeurope")
     def test_containerapp_preview_create_with_environment_id(self, resource_group):
-        # MSI is not available in North Central US (Stage), if the TEST_LOCATION is "northcentralusstage", use eastus as location
-        location = TEST_LOCATION
-        if format_location(location) == format_location(STAGE_LOCATION):
-            location = "eastus"
-        self.cmd('configure --defaults location={}'.format(location))
+        self.cmd('configure --defaults location={}'.format(TEST_LOCATION))
 
         env1 = self.create_random_name(prefix='env1', length=24)
         env2 = self.create_random_name(prefix='env2', length=24)
@@ -51,7 +43,7 @@ class ContainerappYamlTests(ScenarioTest):
 
         # the value in --yaml is used, warning for different value in --environmentId
         containerapp_yaml_text = f"""
-                                location: {location}
+                                location: {TEST_LOCATION}
                                 type: Microsoft.App/containerApps
                                 tags:
                                     tagname: value
@@ -141,7 +133,7 @@ class ContainerappYamlTests(ScenarioTest):
         ])
 
         containerapp_yaml_text = f"""
-                                        location: {location}
+                                        location: {TEST_LOCATION}
                                         type: Microsoft.App/containerApps
                                         tags:
                                             tagname: value
